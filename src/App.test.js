@@ -1,4 +1,4 @@
-import { render, cleanup, rerender, screen } from '@testing-library/react'
+import { render, fireEvent, cleanup, rerender, screen } from '@testing-library/react'
 import Root from './containers/Root'
 import configureStore from './store/configureStore'
 import { rest } from 'msw'
@@ -8,8 +8,8 @@ import users from './users.api.json'
 let store
 const {
   users: [
-    { name: philip },
-    { name: turanga },
+    { name: philip, id: philipId },
+    { name: turanga, id: turangaId },
     { name: bender },
     { name: planet },
     { name: john },
@@ -18,7 +18,7 @@ const {
   ]
 } = users
 
-const regex = text => new RegExp(text)
+const regex = text => new RegExp(text, 'i')
 
 beforeEach(() => {
   store = configureStore()
@@ -66,6 +66,22 @@ describe('200 OK', () => {
     expect(zappOption).toBeInTheDocument()
     expect(kifOption).toBeInTheDocument()
   })
+
+  test('renders selected users', async () => {
+    render(<Root store={store}/>)
+    const loading = screen.getByText(/Loading/i)
+    expect(loading).toBeInTheDocument()
+
+    await screen.findByText(regex(philip))
+    const usersSelect = document.querySelector('.select select')
+
+    fireEvent.change(usersSelect, { target: { value: philipId } })
+
+    const selectedUsersHeading = screen.getByText(/selected users/i)
+    const userInfo = screen.getByText(regex(`ID #${philipId}`))
+
+    expect(selectedUsersHeading).toBeInTheDocument()
+  })
 })
 
 describe('API error', () => {
@@ -86,5 +102,28 @@ describe('API error', () => {
 
     const error = await screen.findByText(/error/)
     expect(error).toBeInTheDocument()
+  })
+})
+
+describe('No users', () => {
+  const server = setupServer(
+    rest.get('https://immense-bastion-95145.herokuapp.com/api/users', (req, res, ctx) => {
+      return res(ctx.json({
+        users: []
+      }))
+    })
+  )
+
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
+  test('handles no users', async () => {
+    render(<Root store={store}/>)
+    const loading = screen.getByText(/Loading/i)
+    expect(loading).toBeInTheDocument()
+
+    const noUsers = await screen.findByText(/No users/)
+    expect(noUsers).toBeInTheDocument()
   })
 })

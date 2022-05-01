@@ -4,6 +4,10 @@ import PropTypes from 'prop-types'
 const UsersSelection = (props) => {
   const { users, onChange } = props
 
+  if (!users.length) {
+    return <div>No users were found...</div>
+  }
+
   const handleChange = e => {
     const { selectedOptions } = e.target
     const selectedOptionsToArray = Array.from(selectedOptions)

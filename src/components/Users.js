@@ -24,6 +24,7 @@ const Users = (props) => {
                 {name}
 	      </div>
 	      <div className="two wide column">
+		<span>{`ID #${id}`}</span>
                 {profile.gender === 'M' ? <i className="male icon"></i> : <i className="female icon"></i>}
 	      </div>
 	      <div className="two wide column">Age: {profile.age}</div>
