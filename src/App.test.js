@@ -9,7 +9,7 @@ let store
 const {
   users: [
     { name: philip, id: philipId },
-    { name: turanga, id: turangaId },
+    { name: turanga },
     { name: bender },
     { name: planet },
     { name: john },
@@ -81,6 +81,7 @@ describe('200 OK', () => {
     const userInfo = screen.getByText(regex(`ID #${philipId}`))
 
     expect(selectedUsersHeading).toBeInTheDocument()
+    expect(userInfo).toBeInTheDocument()
   })
 })
 
