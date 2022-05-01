@@ -32,7 +32,7 @@ class UsersPage extends Component {
     }
 
     if (!users) {
-      return <div>Loading...</div>
+      return <>Loading...&nbsp;<div className="ui active inline loader"></div></>
     }
 
     return (
